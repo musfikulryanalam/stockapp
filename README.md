@@ -1,4 +1,4 @@
-## stock app
+## Stock App
 
 ## About:
   An app that simulates the buying and selling of real time stocks
