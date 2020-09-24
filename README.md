@@ -20,3 +20,7 @@
    Feature 2(Sell): This is where the user can sell stocks from the purchased stocks and the earning or loss will be reflected to the users total money
   
   Feature 3(Portfolio): This is where the list stocks that the user owns will be reflected
+
+
+  Additional Features (Ambitious)
+     Prediticion : If possible the goal to predict the best time to buy or sell a stock
