@@ -4,10 +4,8 @@ import pandas as pd
 from datetime import datetime
 import argparse 
 
-start = '2020-08-03'
-end =  '2020-08-03'
 
-stock = "AMZN"
+
 
 parser = argparse.ArgumentParser(description= 'Calculate and Buy stock')
 parser.add_argument('-t', '--stock', type=str, metavar='', help='Ticker for stock to buy' )
@@ -16,7 +14,14 @@ parser.add_argument('-e','--end', type=str, const=1, default=str(datetime.now().
 args = parser.parse_args()
 
 
-def clean_data(stock_data, col):
+def add_portfolio(stock,shares,total_stock,total_money):
+    portfolio = []
+    portfolio.extend([stock,shares,total_stock,total_money])
+    return portfolio
+
+
+
+def clean_data(start,end,stock_data, col):
     """This Function will take the stock data from yahoo finance and return the ADJ Close number
 
     Args:
@@ -30,21 +35,22 @@ def clean_data(stock_data, col):
     clean_data = stock_data[col].reindex(weekdays)
     return clean_data.fillna(method='ffill')
 
-def get_data(stock, start, end, current):
-    """This Function is to return the stock and calculate the shares and current balance
+def buy(stock, current):
+    """This Function is calculate the purchase of a stock
 
     Args:
         stock : The ticker for given stock
-        start : Start date of purchase
-        end   : End date of purchase
         current : Current money before the purchase
 
     Returns:
-        [type]: Will return total balance after purchase of stock
-    """    
+        [type]: Will return portfolio after purchase of stock
+
+    """   
+    start = str(input("Enter buy date: "))
+    end = start 
     stock_data = data.DataReader(stock, 'yahoo', start, end)
     
-    adj_close = clean_data(stock_data, 'Adj Close')
+    adj_close = clean_data(start, end, stock_data, 'Adj Close')
 
     shares = int(input("How many shares you want to purchase "))
    
@@ -52,15 +58,57 @@ def get_data(stock, start, end, current):
 
     
     if total_stock < current:
-        total = current - total_stock
-        return total
+        total_money = current - total_stock
+        portfolio = add_portfolio(stock,shares,total_stock,total_money)
+        return portfolio
+        
+       
     else:
         print("Not enough funds")
     
     
+def sell (stock,portfolio):
+    """This Function is calculate the sell of a stock
+
+    Args:
+        stock : The ticker for given stock
+        portfolio : Current portfolio before the selling of a stock
+
+    Returns:
+        [type]: Will return portfolio after the selling of stock
+
+    """   
+    start = str(input("Enter sell date: "))
+    end = start 
+    stock_data = data.DataReader(stock, 'yahoo', start, end)
+    adj_close = clean_data(start,end,stock_data, 'Adj Close')
+  
+    
+    sell_shares = int(input("How many shares you want to sell "))
+    if sell_shares > portfolio[1]:
+        print("Not enough shares")
+    else:
+        remain_shares = portfolio[1] - sell_shares
+        total_sell = adj_close[0] * sell_shares
+        total = portfolio[3] + total_sell
+        remain_stock = remain_shares * adj_close[0]
+        if remain_stock == 0:
+            stock = "None"
+        portfolio = add_portfolio(stock,remain_shares,remain_stock,total)
+        return portfolio
+   
 
 
-current = 10000
-stock_data = get_data(args.stock,args.start, args.end, current)
-print(stock_data)
+   
+
+
+
+    
+
+current = 1000
+buy_stock = buy(args.stock, current)
+sell_stock = sell(args.stock,buy_stock)
+print(buy_stock)
+print(sell_stock)
+
 
